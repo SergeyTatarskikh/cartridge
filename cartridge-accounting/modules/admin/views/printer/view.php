@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Редактировать', ['update', 'printer_id' => $model->printer_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Добавить картридж', ['update', 'printer_id' => $model->printer_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Добавить картридж', ['add-cartridge', 'printer_id' => $model->printer_id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Удалить', ['delete', 'printer_id' => $model->printer_id], [
             'class' => 'btn btn-danger',
             'data' => [

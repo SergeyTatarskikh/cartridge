@@ -2,8 +2,12 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\Cartridge;
+use app\models\CartridgePrinterRelation;
 use app\models\Printer;
 use app\modelsPrinterSearch;
+use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -114,6 +118,29 @@ class PrinterController extends Controller
         $this->findModel($printer_id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionAddCartridge($printer_id)
+    {
+        $printer = Printer::findOne($printer_id);
+        $related_cartridges = [];
+        $all_cartridges = Cartridge::find()->asArray()->all();
+
+        if ($printer) {
+            $related_cartridges = $printer->getCartridges();
+        }
+
+        $all_cartridges = ArrayHelper::map($all_cartridges, 'cartridge_id', 'cartridge_id');
+
+        if (Yii::$app->request->isPost) {
+            $cartridgeIDS = Yii::$app->request->post('cartridges');
+            $printer->addCartridges($cartridgeIDS);
+            return $this->redirect(['view', 'printer_id'=>$printer->printer_id]);
+        }
+        return $this->render('printer_cartridges', [
+            'related_cartridges' => $related_cartridges,
+            'all_cartridges' => $all_cartridges
+        ]);
     }
 
     /**

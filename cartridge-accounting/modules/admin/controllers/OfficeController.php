@@ -2,8 +2,13 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\Cartridge;
 use app\models\Office;
 use app\models\OfficeSearch;
+use app\models\Printer;
+use app\models\User;
+use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -130,5 +135,51 @@ class OfficeController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionAddPrinter($office_id)
+    {
+        $office = Office::findOne($office_id);
+        $related_printers = [];
+        $all_printers = Printer::find()->asArray()->all();
+
+        if ($office) {
+            $related_printers = $office->getPrinters();
+        }
+
+        $all_printers = ArrayHelper::map($all_printers, 'printer_id', 'printer_id');
+
+        if (Yii::$app->request->isPost) {
+            $printerIDS = Yii::$app->request->post('printers');
+            $office->addPrinters($printerIDS);
+            return $this->redirect(['view', 'office_id'=>$office->office_id]);
+        }
+        return $this->render('office_printers', [
+            'related_printers' => $related_printers,
+            'all_printers' => $all_printers
+        ]);
+    }
+
+    public function actionAddUser($office_id)
+    {
+        $office = Office::findOne($office_id);
+        $related_users = [];
+        $all_users = User::find()->asArray()->all();
+
+        if ($office) {
+            $related_users = $office->getUsers();
+        }
+
+        $all_users = ArrayHelper::map($all_users, 'user_id', 'user_id');
+
+        if (Yii::$app->request->isPost) {
+            $userIDS = Yii::$app->request->post('users');
+            $office->addUsers($userIDS);
+            return $this->redirect(['view', 'office_id'=>$office->office_id]);
+        }
+        return $this->render('office_users', [
+            'related_users' => $related_users,
+            'all_users' => $all_users
+        ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "printer".
@@ -43,11 +44,37 @@ class Printer extends \yii\db\ActiveRecord
     /**
      * Gets query for [[CartridgePrinterRelations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return array|\yii\db\ActiveRecord[]
      */
-    public function getCartridgePrinterRelations()
+    public function getCartridges()
     {
-        return $this->hasMany(CartridgePrinterRelation::class, ['printer_id' => 'printer_id']);
+        $cartridges = $this->hasMany(CartridgePrinterRelation::class, ['printer_id' => 'printer_id']);
+        $cartridges_ids = $cartridges->select('cartridge_id')->asArray()->all();
+
+        return ArrayHelper::map($cartridges_ids, 'cartridge_id', 'cartridge_id');
+    }
+
+    public function addCartridges($cartridgeIds) {
+
+        $this->clearCurrentCartridges();
+        foreach($cartridgeIds as $cartridgeId) {
+
+            $cartridge = Cartridge::findOne($cartridgeId);
+
+            $relation = new CartridgePrinterRelation();
+
+            $relation->cartridge_id = $cartridge->cartridge_id;
+            $relation->printer_id = $this->printer_id;
+
+            if(!$relation->save()) {
+                print_r('error'); exit;
+            }
+        }
+    }
+
+    private function clearCurrentCartridges(): void
+    {
+        CartridgePrinterRelation::deleteAll(['printer_id' => $this->printer_id]);
     }
 
     /**
@@ -55,8 +82,10 @@ class Printer extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPrinterOfficeRelations()
+    public function getOffices()
     {
         return $this->hasMany(PrinterOfficeRelation::class, ['printer_id' => 'printer_id']);
     }
+
+
 }
