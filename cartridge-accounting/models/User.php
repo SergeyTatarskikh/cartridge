@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".
@@ -16,7 +17,7 @@ use Yii;
  *
  * @property OfficeUserRelation[] $officeUserRelations
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -24,6 +25,11 @@ class User extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'user';
+    }
+
+    public static function findByUsername($username)
+    {
+        return User::find()->where(['login' => $username])->one();
     }
 
     /**
@@ -61,5 +67,35 @@ class User extends \yii\db\ActiveRecord
     public function getOfficeUserRelations()
     {
         return $this->hasMany(OfficeUserRelation::class, ['user_id' => 'user_id']);
+    }
+
+    public static function findIdentity($id)
+    {
+        return User::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        // TODO: Implement findIdentityByAccessToken() method.
+    }
+
+    public function getId()
+    {
+        return $this->user_id;
+    }
+
+    public function getAuthKey()
+    {
+        // TODO: Implement getAuthKey() method.
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        // TODO: Implement validateAuthKey() method.
+    }
+
+    public function validatePassword($password, $role = 0): bool
+    {
+        return $this->password == $password;
     }
 }

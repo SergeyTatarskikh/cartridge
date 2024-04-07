@@ -36,19 +36,25 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Админка', 'url' => ['/admin/default/index']],
-            ['label' => 'Картриджи', 'url' => ['/admin/cartridge/index']],
-            ['label' => 'Принтеры', 'url' => ['/admin/printer/index']],
-            ['label' => 'Кабинеты', 'url' => ['/admin/office/index']],
-            ['label' => 'Пользователи', 'url' => ['/admin/user/index']],
-
-        ]
-    ]);
+    try {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav'],
+            'items' => Yii::$app->user->isGuest ? (
+            [['label' => 'Вход', 'url' => ['/admin/default/login']]]
+            ) : (
+            [
+                ['label' => 'Картриджи', 'url' => ['/admin/cartridge/index']],
+                ['label' => 'Принтеры', 'url' => ['/admin/printer/index']],
+                ['label' => 'Кабинеты', 'url' => ['/admin/office/index']],
+                ['label' => 'Пользователи', 'url' => ['/admin/user/index']],
+            ]
+            )
+        ]);
+    } catch (Throwable $e) {
+    }
     NavBar::end();
     ?>
+
 </header>
 
 <main id="main" class="flex-shrink-0" role="main">
@@ -60,7 +66,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         <?= $content ?>
     </div>
 </main>
-
+<?php
+if (Yii::$app->user->isGuest) {
+    print_r('гость');
+} else {
+    print_r('не гость');
+}
+?>
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">
