@@ -170,7 +170,7 @@ class OfficeController extends Controller
             $related_users = $office->getUsers();
         }
 
-        $all_users = ArrayHelper::map($all_users, 'user_id', 'user_id');
+        $all_users = ArrayHelper::map($all_users, 'user_id', 'firstname');
 
         if (Yii::$app->request->isPost) {
             $userIDS = Yii::$app->request->post('users');

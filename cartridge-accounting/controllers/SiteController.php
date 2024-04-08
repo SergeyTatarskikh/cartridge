@@ -74,11 +74,20 @@ class SiteController extends Controller
                 // если пользователь авторизован но не админ
                 return $this->redirect('site/accounting');
             } else {
-                return $this->render('quest');
+                $status = "Войдите";
+                return $this->redirect(['site/before', 'status' => $status]);
+
             }
         } else {
             return $this->redirect('site/accounting');
         }
+    }
+
+    public function actionBefore($status)
+    {
+        return $this->render('before', [
+            'status' => $status
+        ]);
     }
     public function actionAccounting() {
 
@@ -86,7 +95,12 @@ class SiteController extends Controller
 
         $officeUserRelation = OfficeUserRelation::find()->where(['user_id' => Yii::$app->user->identity->user_id])->one();
 
-        $office = Office::find()->where(['office_id' => $officeUserRelation->office_id])->one();
+        if (!$officeUserRelation) {
+            $status = "Вы не привязаны ни к одному из офисов";
+            return $this->redirect(['site/before', 'status' => $status]);
+
+        }
+        $office = Office::find()->where(['office_id' => $officeUserRelation->office_id])->one() ?? 0;
 
         $printersOfficeRelation = PrinterOfficeRelation::find()->where(['office_id' => $office->office_id])->all();
 
