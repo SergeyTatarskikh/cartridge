@@ -71,6 +71,7 @@ class SiteController extends Controller
     {
         if (Yii::$app->user->isGuest) {
             if (isset(Yii::$app->user->identity->user_id)) {
+                // если пользователь авторизован но не админ
                 return $this->redirect('site/accounting');
             } else {
                 return $this->render('quest');
@@ -80,27 +81,23 @@ class SiteController extends Controller
         }
     }
     public function actionAccounting() {
+
         $user = User::find()->where(['user_id' => Yii::$app->user->identity->user_id])->one();
 
         $officeUserRelation = OfficeUserRelation::find()->where(['user_id' => Yii::$app->user->identity->user_id])->one();
 
         $office = Office::find()->where(['office_id' => $officeUserRelation->office_id])->one();
 
-        // Получаем все связи принтеров с офисом
         $printersOfficeRelation = PrinterOfficeRelation::find()->where(['office_id' => $office->office_id])->all();
 
-// Создаем массив для хранения идентификаторов принтеров
         $printerIds = [];
 
-// Получаем идентификаторы принтеров из связей
         foreach ($printersOfficeRelation as $relation) {
             $printerIds[] = $relation->printer_id;
         }
 
-// Используем идентификаторы принтеров для получения информации о принтерах
         $printers = Printer::find()->where(['printer_id' => $printerIds])->all();
 
-        //print_r(Yii::$app->user->identity->user_id); exit;
         return $this->render('accounting', [
             'user' => $user,
             'office' => $office,
@@ -139,6 +136,7 @@ class SiteController extends Controller
 
         $cartridge_printer = CartridgePrinterRelation::find()->where(['printer_id' => $printer_id])->one();
         $cartridge = Cartridge::find()->where(['cartridge_id' => $cartridge_printer->cartridge_id])->one();
+
         $office_printer = PrinterOfficeRelation::find()->where(['printer_id' => $printer_id])->one();
         $office = Office::find()->where(['office_id' => $office_printer->office_id])->one();
 
