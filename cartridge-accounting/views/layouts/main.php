@@ -39,7 +39,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'
@@ -50,9 +49,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 )
                 . Html::endForm()
                 . '</li>',
-            Yii::$app->user->isGuest
-                ? ''
-                : ['label' => 'About', 'url' => ['/site/about']]
         ]
     ]);
 
@@ -70,13 +66,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         <?= $content ?>
     </div>
 </main>
-<?php
-if (Yii::$app->user->isGuest) {
-    print_r('гость');
-} else {
-    print_r('не гость');
-}
-?>
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">

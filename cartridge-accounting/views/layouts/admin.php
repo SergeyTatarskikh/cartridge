@@ -33,7 +33,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
+        'brandUrl' => '/admin/default/index',
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
     try {
@@ -47,6 +47,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 ['label' => 'Принтеры', 'url' => ['/admin/printer/index']],
                 ['label' => 'Кабинеты', 'url' => ['/admin/office/index']],
                 ['label' => 'Пользователи', 'url' => ['/admin/user/index']],
+                ['label' => 'Выйти', 'url' => ['/admin/default/logout']],
             ]
             )
         ]);
@@ -66,13 +67,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         <?= $content ?>
     </div>
 </main>
-<?php
-if (Yii::$app->user->isGuest) {
-    print_r('гость');
-} else {
-    print_r('не гость');
-}
-?>
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">

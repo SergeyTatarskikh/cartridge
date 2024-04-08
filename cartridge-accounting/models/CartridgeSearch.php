@@ -17,7 +17,8 @@ class CartridgeSearch extends Cartridge
     public function rules()
     {
         return [
-            [['cartridge_id'], 'integer'],
+            [['cartridge_id'], ['price'], 'integer'],
+
         ];
     }
 

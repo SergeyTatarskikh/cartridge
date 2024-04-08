@@ -95,9 +95,9 @@ class CartridgeController extends Controller
     public function actionUpdate($cartridge_id)
     {
         $model = $this->findModel($cartridge_id);
-
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'cartridge_id' => $model->cartridge_id]);
+            //print_r($this->request->post()); exit;
+            return $this->redirect(['view', 'cartridge_id' => $model->cartridge_id, 'price' => $model->price]);
         }
 
         return $this->render('update', [

@@ -2,6 +2,14 @@
 
 namespace app\controllers;
 
+use app\models\Cartridge;
+use app\models\CartridgePrinterRelation;
+use app\models\Office;
+use app\models\OfficeUserRelation;
+use app\models\Order;
+use app\models\Printer;
+use app\models\PrinterOfficeRelation;
+use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -61,8 +69,47 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        if (Yii::$app->user->isGuest) {
+            if (isset(Yii::$app->user->identity->user_id)) {
+                return $this->redirect('site/accounting');
+            } else {
+                return $this->render('quest');
+            }
+        } else {
+            return $this->redirect('site/accounting');
+        }
     }
+    public function actionAccounting() {
+        $user = User::find()->where(['user_id' => Yii::$app->user->identity->user_id])->one();
+
+        $officeUserRelation = OfficeUserRelation::find()->where(['user_id' => Yii::$app->user->identity->user_id])->one();
+
+        $office = Office::find()->where(['office_id' => $officeUserRelation->office_id])->one();
+
+        // Получаем все связи принтеров с офисом
+        $printersOfficeRelation = PrinterOfficeRelation::find()->where(['office_id' => $office->office_id])->all();
+
+// Создаем массив для хранения идентификаторов принтеров
+        $printerIds = [];
+
+// Получаем идентификаторы принтеров из связей
+        foreach ($printersOfficeRelation as $relation) {
+            $printerIds[] = $relation->printer_id;
+        }
+
+// Используем идентификаторы принтеров для получения информации о принтерах
+        $printers = Printer::find()->where(['printer_id' => $printerIds])->all();
+
+        //print_r(Yii::$app->user->identity->user_id); exit;
+        return $this->render('accounting', [
+            'user' => $user,
+            'office' => $office,
+            'printers' => $printers
+
+        ]);
+
+    }
+
 
     /**
      * Login action.
@@ -85,6 +132,40 @@ class SiteController extends Controller
         return $this->render('login', [
             'model' => $model,
         ]);
+    }
+
+    public function actionPrinter($printer_id)
+    {
+
+        $cartridge_printer = CartridgePrinterRelation::find()->where(['printer_id' => $printer_id])->one();
+        $cartridge = Cartridge::find()->where(['cartridge_id' => $cartridge_printer->cartridge_id])->one();
+        $office_printer = PrinterOfficeRelation::find()->where(['printer_id' => $printer_id])->one();
+        $office = Office::find()->where(['office_id' => $office_printer->office_id])->one();
+
+        $is_refilled = Order::find()->where(['cartridge_id' => $cartridge->cartridge_id])->one();
+
+        return $this->render('printer', [
+            'printer' => $printer_id,
+            'cartridge' => $cartridge->cartridge_id,
+            'price' => $cartridge->price,
+            'office_id' => $office->office_id,
+            'is_refilled' => $is_refilled
+        ]);
+    }
+
+    public function actionOrder($office_id, $printer_id, $cartridge_id, $price)
+    {
+        $order = new Order();
+        $order->office_id = $office_id;
+        $order->cartridge_id = $cartridge_id;
+        $order->printer_id = $printer_id;
+        $order->price = $price;
+
+        if(!$order->save()) {
+            print_r('error'); exit;
+        }
+
+        return $this->redirect('accounting');
     }
 
     /**

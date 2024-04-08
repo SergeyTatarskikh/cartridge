@@ -3,6 +3,7 @@
 namespace app\modules\admin\controllers;
 
 use app\models\LoginForm;
+use app\models\Order;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -15,30 +16,21 @@ class DefaultController extends Controller
 {
     public function actionIndex()
     {
-        return $this->render('index');
+        $order = Order::find()->asArray()->all();
+        $total_price = 0;
+        foreach ($order as $item) {
+            $total_price += $item['price'];
+        }
+        return $this->render('index', [
+            'order' => $order,
+            'total_price' => $total_price
+        ]);
     }
 
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-    public function actionLogin(): Response|string
+    public function actionTake()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->render('index');
-        }
-
-        $model->password = '';
-
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+        Order::deleteAll();
+        return $this->redirect('index');
     }
 
     /**

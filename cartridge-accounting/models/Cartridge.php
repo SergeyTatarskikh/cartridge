@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "cartridge".
  *
  * @property int $cartridge_id
+ * @property int $price
  *
  * @property CartridgePrinterRelation[] $cartridgePrinterRelations
  */
@@ -26,8 +27,11 @@ class Cartridge extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [];
+        return [
+            [['cartridge_id', 'price'], 'required'],
+        ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -36,6 +40,7 @@ class Cartridge extends \yii\db\ActiveRecord
     {
         return [
             'cartridge_id' => 'Cartridge ID',
+            'price' => 'Цена',
         ];
     }
 
